@@ -22,7 +22,16 @@ public class User {
 
     private String password;
 
-    public static User create(String email, String name, String password) {
-        return new User(null, email, name, password);
+    private int activityScore = 0;
+
+    public static User create(String email, String name, String password, int activityScore) {
+        return new User(null, email, name, password, activityScore);
     }
+
+    // 활동 점수 적립 (나중에 Service 로직 짤 때 사용)
+    public void addActivityScore(int score) {
+        this.activityScore += score;
+    }
+
+
 }
