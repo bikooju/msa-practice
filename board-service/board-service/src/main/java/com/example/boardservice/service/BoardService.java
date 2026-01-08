@@ -39,7 +39,12 @@ public class BoardService {
             isPointDeducted = true; // 포인트 차감 성공 플래그
             System.out.println("포인트 차감 성공");
 
-            Board board = Board.create(createBoardRequestDto.getTitle(), createBoardRequestDto.getContent(), createBoardRequestDto.getUserId());
+            Board board = new Board(
+                createBoardRequestDto.getTitle(),
+                createBoardRequestDto.getContent(),
+                createBoardRequestDto.getUserId()
+            );
+
             Board savedBoard = boardRepository.save(board);
             savedBoardId = savedBoard.getBoardId();
             isBoardCreated = true; // 게시글 저장 성공 플래그

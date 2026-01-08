@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "boards")
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Board {
     @Id
@@ -21,7 +20,9 @@ public class Board {
 
     private Long userId; // FK 설정 안하고 그냥 컬럼으로 선언
 
-    public static Board create(String title, String content, Long userId) {
-        return new Board(null, title, content, userId);
+    public Board(String title, String content, Long userId) {
+        this.title = title;
+        this.content = content;
+        this.userId = userId;
     }
 }
