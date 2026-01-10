@@ -2,14 +2,15 @@
 <img width="500" height="700" alt="image" src="https://github.com/user-attachments/assets/27ceb443-7077-44d4-bd8f-ab2cebdfb2d6" />
 
 
-**[구현한 기능]**
-- ## 회원가입 API → 포인트 적립
+## [구현한 기능]
+- ### 회원가입 API → 포인트 적립
    - 게시글 서비스에서 사용해야 하는 사용자 데이터(user_id, name)를 동기화하기 위해서, 사용자 서비스에서 user_id, name의 데이터가 생성/변경/삭제가 될 때마다 카프카로 이벤트를 발행해주어야 한다.
    - 회원가입 API에서 "**게시글 조회 API 최적화를 위해서**" 사용자 서비스에 있는 유저 테이블과 게시글 서비스의 데이터 동기화를 할려고 회원가입 API에 카프카로 이벤트 발행을 하였다.
 
     <img width="700" height="580" alt="image" src="https://github.com/user-attachments/assets/842feae4-2774-447a-90d9-0f7554fd9acc" />
 
   ### 게시글 조회 API 최적화
+  
   <img width="700" height="642" alt="image" src="https://github.com/user-attachments/assets/a0185fe0-2a19-44e3-b169-cd68bc79fbce" />
   
   - ‘게시글 조회 로직’을 구현할 때 위의 방식처럼 구현했었다. 이 방식은 게시글 조회 로직의 트래픽이 점차 증가하면서 사용자 서비스의 ‘사용자 DB’에 부담을 줄 수 있다. 또한 ‘게시글 조회 로직’이 더 복잡해져서 사용자 서비스 뿐만 아니라 여러 서비스에 데이터를 조회해서 사용해야 한다면 로직이 복잡해진다.
