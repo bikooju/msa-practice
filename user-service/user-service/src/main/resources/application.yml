@@ -11,6 +11,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    # Kafka 서버 주소
+    bootstrap-servers: localhost:9092
+    # 사용자 서비스에서는 메시지를 consume 하기만 함
+    consumer:
+      # 메시지의 key 역직렬화 방식 : Kafka에서 받아온 메시지를 String으로 변환
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 메시지의 value 역직렬화 방식 : Kafka에서 받아온 메시지를 String으로 변환
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 client:
   point-service:
