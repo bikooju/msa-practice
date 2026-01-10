@@ -2,4 +2,4 @@
 *.xml
 .gitignore
 /db/*
-
+*.log
