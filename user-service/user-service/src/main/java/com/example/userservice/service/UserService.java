@@ -2,27 +2,42 @@ package com.example.userservice.service;
 
 import com.example.userservice.client.PointClient;
 import com.example.userservice.dto.request.AddActivityScoreRequestDto;
+import com.example.userservice.dto.request.LoginRequestDto;
 import com.example.userservice.dto.request.SignUpRequestDto;
+import com.example.userservice.dto.response.LoginResponseDto;
 import com.example.userservice.dto.response.UserResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.event.UserSignedUpEvent;
 import com.example.userservice.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PointClient pointClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final String jwtSecret;
+
+    public UserService(UserRepository userRepository, PointClient pointClient,
+        KafkaTemplate<String, String> kafkaTemplate, @Value("${jwt.secret}") String jwtSecret) {
+        this.userRepository = userRepository;
+        this.pointClient = pointClient;
+        this.kafkaTemplate = kafkaTemplate;
+        this.jwtSecret = jwtSecret;
+    }
 
     @Transactional
     public void signup(SignUpRequestDto request) {
@@ -88,5 +103,28 @@ public class UserService {
 
         userRepository.save(user);
 //        throw new RuntimeException("에러 발생"); // 보상 트랜잭션 테스트 하기 위해서 예외 던짐
+    }
+
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // JWT를 만들 때 사용하는 Key 생성 (공식 문서 방식)
+        SecretKey secretKey = Keys.hmacShaKeyFor(
+            jwtSecret.getBytes(StandardCharsets.UTF_8)
+        );
+
+        // JWT 토큰 만들기
+        String token = Jwts.builder()
+            .subject(user.getUserId().toString())
+            .signWith(secretKey)
+            .compact();
+
+        return new LoginResponseDto(token);
+
     }
 }

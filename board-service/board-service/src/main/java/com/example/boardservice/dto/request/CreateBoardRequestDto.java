@@ -8,6 +8,5 @@ public class CreateBoardRequestDto {
 
     private String content;
 
-    private Long userId;
 }
 

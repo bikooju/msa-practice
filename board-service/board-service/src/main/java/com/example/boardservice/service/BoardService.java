@@ -27,7 +27,7 @@ public class BoardService {
     private final PointClient pointClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void create(CreateBoardRequestDto createBoardRequestDto) {
+    public void create(CreateBoardRequestDto createBoardRequestDto, Long userId) {
 
         // 게시글 저장을 성공했는지 판단하는 플래그
         boolean isBoardCreated = false;
@@ -38,14 +38,14 @@ public class BoardService {
 
         try {
             // 게시글 작성 전 100 포인트 차감
-            pointClient.deductPoint(createBoardRequestDto.getUserId(), 100);
+            pointClient.deductPoint(userId, 100);
             isPointDeducted = true; // 포인트 차감 성공 플래그
             System.out.println("포인트 차감 성공");
 
             Board board = new Board(
                 createBoardRequestDto.getTitle(),
                 createBoardRequestDto.getContent(),
-                createBoardRequestDto.getUserId()
+                userId
             );
 
             Board savedBoard = boardRepository.save(board);
@@ -58,7 +58,7 @@ public class BoardService {
 //            System.out.println("포인트 적립 성공");
 
             // '게시글 작성 완료' 이벤트 발행
-            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(createBoardRequestDto.getUserId());
+            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(userId);
             this.kafkaTemplate.send("board.created", toJsonString(boardCreatedEvent));
             System.out.println("게시글 작성 완료 이벤트 발행");
         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class BoardService {
 
             if (isPointDeducted) {
                 // 포인트 차감 보상 트랜잭션 => 포인트 적립
-                pointClient.addPoints(createBoardRequestDto.getUserId(), 100);
+                pointClient.addPoints(userId, 100);
                 System.out.println("[보상 트랜잭션] 포인트 적립");
             }
 

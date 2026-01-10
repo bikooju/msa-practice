@@ -10,35 +10,37 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/boards")
+@RequestMapping("/api/boards")
 public class BoardController {
 
-    private final BoardService boardService;
+  private final BoardService boardService;
 
-    @PostMapping
-    public ResponseEntity<Void> create(
-            @RequestBody CreateBoardRequestDto request
-    ) {
-        boardService.create(request);
-        return ResponseEntity.noContent().build();
-    }
+  @PostMapping
+  public ResponseEntity<Void> create(
+      @RequestBody CreateBoardRequestDto request,
+      @RequestHeader("X-User-Id") Long userId
+  ) {
+    boardService.create(request, userId);
+    return ResponseEntity.noContent().build();
+  }
 
-    @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResponseDto> getBoard(@PathVariable Long boardId) {
+  @GetMapping("/{boardId}")
+  public ResponseEntity<BoardResponseDto> getBoard(@PathVariable Long boardId) {
 //        BoardResponseDto boardResponseDto = boardService.getBoard(boardId);
-        BoardResponseDto boardResponseDto = boardService.getBoard2(boardId);
-        return ResponseEntity.ok(boardResponseDto);
-    }
+    BoardResponseDto boardResponseDto = boardService.getBoard2(boardId);
+    return ResponseEntity.ok(boardResponseDto);
+  }
 
-    @GetMapping()
-    public ResponseEntity<List<BoardResponseDto>> getBoards() {
+  @GetMapping()
+  public ResponseEntity<List<BoardResponseDto>> getBoards() {
 //        List<BoardResponseDto> boardResponseDtos = boardService.getBoards();
-        List<BoardResponseDto> boardResponseDtos = boardService.getBoards2();
-        return ResponseEntity.ok(boardResponseDtos);
-    }
+    List<BoardResponseDto> boardResponseDtos = boardService.getBoards2();
+    return ResponseEntity.ok(boardResponseDtos);
+  }
 }
