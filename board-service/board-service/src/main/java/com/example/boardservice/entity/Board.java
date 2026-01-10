@@ -18,7 +18,12 @@ public class Board {
 
     private String content;
 
-    private Long userId; // FK 설정 안하고 그냥 컬럼으로 선언
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false) // 조회용
+    private User user;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     public Board(String title, String content, Long userId) {
         this.title = title;
